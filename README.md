@@ -11,87 +11,87 @@ Repositorio del Caso #1 de Bases de Datos I.
 Entidades: 
 
 - Profiles
-Users
-Roles
-UserRoles
-Permissions
-RolePermissions
+1. Users
+2. Roles
+3. UserRoles
+4. Permissions
+5. RolePermissions
 
 - Espacio y Comercio
-Mercado
-Building
-BuildingxMercado
-Spaces
-SpaceAttributes
-SpaceTypes
-SpaceStatus
-Commerces
-Commerce Category
-CommerceStatus
+6. Mercado
+7. Building
+8. BuildingxMercado
+9. Spaces
+10. SpaceAttributes
+11. SpaceTypes
+12. SpaceStatus
+13. Commerces
+14. Commerce Category
+15. CommerceStatus
 
 - Localizaciones
-Countries
-States
-Cities
-Address
+16. Countries
+17. States
+18. Cities
+19. Address
 
 - Contratos con Comercios y Buildings
-Contracts 
-ContractPerCommerce
-ContractStatus
-ContractTerms
-ContractPerBuilding (Seria el contrato que tiene el mercado con el edificio)
-ContractRenewals
+20. Contracts 
+21. ContractPerCommerce
+22. ContractStatus
+23. ContractTerms
+24. ContractPerBuilding (Seria el contrato que tiene el mercado con el edificio)
+25. ContractRenewals
 
 - Logs
-Log
-LogTypes
-Log Sources
-Log Severities
+26. Log
+27. LogTypes
+28. Log Sources
+29. Log Severities
 
 - Inventario y Productos
-Products
-ProductCategories
-ProductBrands
-ProductUnits
-ProductPrice
-Inventory
-InventoryMovements
-Barcodes
+30. Products
+31. ProductCategories
+32. ProductBrands
+33. ProductUnits
+34. ProductPrice
+35. Inventory
+36. InventoryMovements
+37. Barcodes
 
 - Ventas y Facturacion
-Sales
-SalesDetails
-Invoices
-InvoiceDetails
-Receipts
-SaleDiscounts
-SalePromotions
+38. Sales
+39. SalesDetails
+40. Invoices
+41. InvoiceDetails
+42. Receipts
+43. SaleDiscounts
+44. SalePromotions
 
 - Finanzas y Contabilidad
-InitialInvestments
-OperationalExpenses
-ExpenseCategories
-AccountsReceivable
-FinancialTransactions
-TransactionTypes
-CommissionCalculations
-CommerceSettlement
-CommenrceSettlementDetail
+45. InitialInvestments
+46. OperationalExpenses
+47. ExpenseCategories
+48. AccountsReceivable
+49. FinancialTransactions
+50. TransactionTypes
+51. CommissionCalculations
+52. CommerceSettlement
+53. CommenrceSettlementDetail
 
 - Payments 
-PaymentMethods
-PaymentConfirmations
-PaymentReferences
-SalePayments
+54. PaymentMethods
+55. PaymentConfirmations
+56. PaymentReferences
+57. SalePayments
 
 - Reports and Analysis
-TenantMonthlyReports
-ConsolidatedTenantReports
-SpaceOccupancyReports
-FinancialComparativeReports
-ReportTemplates
-ReportConfigurations
-GeneratedReports
+58. TenantMonthlyReports
+59. ConsolidatedTenantReports
+60. SpaceOccupancyReports
+61. FinancialComparativeReports
+62. ReportTemplates
+63. ReportConfigurations
+64. GeneratedReports
 
 

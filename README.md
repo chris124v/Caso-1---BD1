@@ -10,14 +10,14 @@ Repositorio del Caso #1 de Bases de Datos I.
 
 Entidades: 
 
-- Profiles
+- Profiles (Chris)
 1. Users
 2. Roles
 3. UserRoles
 4. Permissions
 5. RolePermissions
 
-- Espacio y Comercio
+- Espacio y Comercio (Dylan)
 6. Mercado
 7. Building
 8. BuildingxMercado
@@ -29,13 +29,13 @@ Entidades:
 14. Commerce Category
 15. CommerceStatus
 
-- Localizaciones
+- Localizaciones (Chris) 
 16. Countries
 17. States
 18. Cities
 19. Address
 
-- Contratos con Comercios y Buildings
+- Contratos con Comercios y Buildings (Chris) 
 20. Contracts 
 21. ContractPerCommerce
 22. ContractStatus
@@ -43,13 +43,13 @@ Entidades:
 24. ContractPerBuilding (Seria el contrato que tiene el mercado con el edificio)
 25. ContractRenewals
 
-- Logs
+- Logs (Dylan)
 26. Log
 27. LogTypes
 28. Log Sources
 29. Log Severities
 
-- Inventario y Productos
+- Inventario y Productos (Dylan)
 30. Products
 31. ProductCategories
 32. ProductBrands
@@ -59,7 +59,7 @@ Entidades:
 36. InventoryMovements
 37. Barcodes
 
-- Ventas y Facturacion
+- Ventas y Facturacion (Chris)
 38. Sales
 39. SalesDetails
 40. Invoices
@@ -68,7 +68,7 @@ Entidades:
 43. SaleDiscounts
 44. SalePromotions
 
-- Finanzas y Contabilidad
+- Finanzas y Contabilidad (Chris)
 45. InitialInvestments
 46. OperationalExpenses
 47. ExpenseCategories
@@ -79,13 +79,13 @@ Entidades:
 52. CommerceSettlement
 53. CommenrceSettlementDetail
 
-- Payments 
+- Payments (Dylan)
 54. PaymentMethods
 55. PaymentConfirmations
 56. PaymentReferences
 57. SalePayments
 
-- Reports and Analysis
+- Reports and Analysis (Dylan)
 58. TenantMonthlyReports
 59. ConsolidatedTenantReports
 60. SpaceOccupancyReports

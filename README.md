@@ -40,7 +40,7 @@ Entidades:
 21. ContractPerCommerce
 22. ContractStatus
 23. ContractTerms
-24. ContractPerBuilding (Seria el contrato que tiene el mercado con el edificio)
+24. ContractPerBuilding (Lo voy a quitar)
 25. ContractRenewals
 
 - Logs (Dylan)

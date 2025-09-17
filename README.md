@@ -72,7 +72,7 @@ Entidades:
 46. OperationalExpenses (Gastos operacionales en el mercado)
 47. ExpenseCategories (Categorias de gastos)
 48. AccountsReceivable (Lo que debe el comercio)
-49. FinancialTransactions (Registro de los pagos recibidos)
+49. FinancialTransactions (Registro de los pagos recibidos y realizados)
 50. TransactionTypes (Tipos de Transaccion)
 51. CommissionCalculations (Calculo de las comisiones del comercio)
 52. CommerceSettlement (Resumen mensual de ventas)
@@ -92,5 +92,3 @@ Entidades:
 62. ReportTemplates
 63. ReportConfigurations
 64. GeneratedReports
-
-

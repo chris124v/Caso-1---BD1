@@ -28,6 +28,8 @@ Entidades:
 13. Commerces (Comercios dentro del mercado)
 14. Commerce Category (Categoria del comercio: restaurante, tienda de conveniencia etc..)
 15. CommerceStatus (Si esta activo, remodelandose, etc)
+16. MercadoXUsers
+17. UsersPerCommerce
 
 - Localizaciones (Chris) - Space and Contract Management
 16. Countries (Paises dentro del sistema)
@@ -58,6 +60,7 @@ Entidades:
 35. Inventory (Inventario que posee cada negocio)
 36. InventoryMovements (Movimientos del inventario)
 37. Barcodes (Barcode especifico de cada producto)
+38.ProductsXMercadoPerBuilding (Aqui pongo los prices history)
 
 - Ventas y Facturacion (Chris) - POS
 38. Sales (Ventas registradas en el negocio)
@@ -84,7 +87,7 @@ Entidades:
 56. PaymentReferences
 57. SalePayments
 
-- Reports and Analysis (Dylan)
+- Reports and Analysis (Dylan) Directamente 
 58. TenantMonthlyReports
 59. ConsolidatedTenantReports
 60. SpaceOccupancyReports

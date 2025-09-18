@@ -28,70 +28,58 @@ Entidades:
 13. Commerces (Comercios dentro del mercado)
 14. Commerce Category (Categoria del comercio: restaurante, tienda de conveniencia etc..)
 15. CommerceStatus (Si esta activo, remodelandose, etc)
-16. MercadoXUsers
-17. UsersPerCommerce
+16. UsersPerMercado (Administrativos de la empresa que dirigen los mercados, un usuario administratio puede operar en uno o mas mercados, esto tambien incluiria que un mercado no es manejado por solo una persona sino por mas)
+17. UsersPerCommerce (Usuarios de cada comercio independiente)
+18. MKSpacesPerAttributes (Un space tiene mucho atributos y un atributo puede aplicar para varios spaces)
 
 - Localizaciones (Chris) - Space and Contract Management
-16. Countries (Paises dentro del sistema)
-17. States (Provincias o estado dentro del sistema)
-18. Cities (Ciudades dentro de las provincias o estados)
-19. Address (Direccion especifica de los lugares)
+19. Countries (Paises dentro del sistema)
+20. States (Provincias o estado dentro del sistema)
+21. Cities (Ciudades dentro de las provincias o estados)
+22. Address (Direccion especifica de los lugares)
 
 - Contratos con Comercios y Buildings (Chris) - Space and Contract Management
-20. Contracts (Contratos generales)
-21. ContractPerCommerce (Contratos por cada comercio Maestro-Detalle)
-22. ContractStatus (Estado del contrato si esta vigente o es suspendido)
-23. ContractTerms (Terminos de un contrato, un contrato tiene muchos terminos)
-24. ContractPerBuilding (Lo voy a quitar)
-25. ContractRenewals (Renovaciones de contratos con los comercios)
-26. ContractTypes (Tipos de contratos en el sistema)
+23. Contracts (Contratos generales)
+24. ContractPerCommerce (Contratos por cada comercio Maestro-Detalle)
+25. ContractStatus (Estado del contrato si esta vigente o es suspendido)
+26. ContractTerms (Terminos de un contrato, un contrato tiene muchos terminos)
+27. ContractPerBuilding (Lo voy a quitar)
+28. ContractRenewals (Renovaciones de contratos con los comercios)
+29. ContractTypes (Tipos de contratos en el sistema)
 
 - Logs (Dylan) - User and Access Control
-26. Log (Registros de lo que sucede en el sistema)
-27. LogTypes (Tipo de log)
-28. Log Sources (Origen del log, login etc)
-29. Log Severities (Nivel de importancia del log)
+30. Log (Registros de lo que sucede en el sistema)
+31. LogTypes (Tipo de log)
+32. Log Sources (Origen del log, login etc)
+33. Log Severities (Nivel de importancia del log)
 
 - Inventario y Productos (Dylan) - POS
-30. Products (Productos disponibles en el inventario)
-31. ProductCategories (Distintas categorias de los productos)
-32. ProductBrands (Marcas de los diferentes productos)
-34. ProductPrice (Historial de los precios de un producto)
-35. Inventory (Inventario que posee cada negocio)
-36. InventoryMovements (Movimientos del inventario)
-37. Barcodes (Barcode especifico de cada producto)
-38.ProductsXMercadoPerBuilding (Aqui pongo los prices history)
+34. Products (Productos disponibles en el inventario)
+35. ProductCategories (Distintas categorias de los productos)
+36. ProductBrands (Marcas de los diferentes productos)
+37. ProductPrice (Historial de los precios de un producto)
+38. Inventory (Inventario que posee cada negocio)
+39. InventoryMovements (Movimientos del inventario)
+40. Barcodes (Barcode especifico de cada producto)
+41. ProductsXMercadoPerBuilding (Aqui pongo los prices history y seria la tabla de que productos hay en cada mercado dependiendo del edificio)
 
 - Ventas y Facturacion (Chris) - POS
-38. Sales (Ventas registradas en el negocio)
-39. SalesDetails (Detalle de la venta)
-40. Invoices (Factura con validez tributaria en caso de que el cliente lo necesite)
-41. InvoiceDetails (Detalles de la factura con validez tributaria)
-42. Receipts (Recibos normales o facturas del comercio)
-43. SaleDiscounts (Descuentos aplicados a las ventas)
+42. Sales (Ventas registradas en el negocio)
+43. SalesDetails (Detalle de la venta)
+44. Invoices (Factura con validez tributaria en caso de que el cliente lo necesite)
+45. InvoiceDetails (Detalles de la factura con validez tributaria)
+46. Receipts (Recibos normales o facturas del comercio)
+47. SaleDiscounts (Descuentos aplicados a las ventas)
+48. PaymentMethods (Metodos de pago disponibles)
+49. MKRelatedEntityType (Que entidades realizaron la transaccion)
 
 - Finanzas y Contabilidad (Chris) -  Administrator Financial Management
-45. InitialInvestments (Tabla para los investements que se realicen para el mercado)
-46. OperationalExpenses (Gastos operacionales en el mercado)
-47. ExpenseCategories (Categorias de gastos)
-48. AccountsReceivable (Lo que debe el comercio)
-49. FinancialTransactions (Registro de los pagos recibidos y realizados)
-50. TransactionTypes (Tipos de Transaccion)
-51. CommissionCalculations (Calculo de las comisiones del comercio)
-52. CommerceSettlement (Resumen mensual de ventas)
-53. CommenrceSettlementDetail (Detalles del resumen mensual de ventas)
+50. InitialInvestments (Tabla para los investements que se realicen para el mercado)
+51. FinancialTransactions (Registro de los pagos recibidos y realizados)
+52. TransactionTypes (Tipos de Transaccion)
+53. CommissionCalculations (Calculo de las comisiones del comercio)
+54. CommissionCalculationsDetail (Calculo de las comisiones por producto)
+55. CommerceSettlement (Resumen mensual de ventas)
+56. CommenrceSettlementDetail (Detalles del resumen mensual de ventas)
 
-- Payments (Dylan)
-54. PaymentMethods
-55. PaymentConfirmations
-56. PaymentReferences
-57. SalePayments
 
-- Reports and Analysis (Dylan) Directamente 
-58. TenantMonthlyReports
-59. ConsolidatedTenantReports
-60. SpaceOccupancyReports
-61. FinancialComparativeReports
-62. ReportTemplates
-63. ReportConfigurations
-64. GeneratedReports

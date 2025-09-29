@@ -8,7 +8,7 @@ from app.repositories.base_repository import BaseRepository
 logging.basicConfig(level=logging.INFO)
 
 def main():
-    print("Probando Repository Base...")
+    print("Probando Repository Base")
     print("=" * 50)
     
     try:
@@ -27,7 +27,7 @@ def main():
             table_name = list(table.values())[0]
             print(f"   {i+1}. {table_name}")
         
-        # Test 3: Obtener información específica
+        # Test 3: Obtener informacion específica
         print("\nTest 3: Verificar tabla MKUsers")
         user_count = repo.execute_scalar("SELECT COUNT(*) FROM MKUsers")
         print(f"Número de usuarios en MKUsers: {user_count}")
@@ -45,7 +45,7 @@ def main():
             # Probar tabla que no existe
             try:
                 repo.get_next_id("TablaInexistente")
-                
+
             except ValueError as e:
                 print(f"Error esperado: {e}")
         

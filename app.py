@@ -3,14 +3,14 @@ from fastapi import FastAPI
 # Crear la aplicación FastAPI
 app = FastAPI(
     title="Merkadit API - Caso 1",
-    description="API para gestión de mercados gastronómicos - TEC",
+    description="API para gestion de Merkadit - TEC",
     version="1.0.0"
 )
 
 @app.get("/")
 def read_root():
     return {
-        "message": "¡Merkadit API funcionando correctamente!", 
+        "message": "Merkadit API funcionando correctamente", 
         "proyecto": "Caso 1 - Bases de Datos I",
         "universidad": "TEC",
         "status": "OK"
@@ -20,7 +20,7 @@ def read_root():
 def test_endpoint():
     return {
         "test": "exitoso", 
-        "descripcion": "API para mercados gastronómicos",
+        "descripcion": "API para mercados gastronomicos o comercios",
         "funcionalidades": ["ventas", "liquidaciones", "stored procedures"]
     }
 

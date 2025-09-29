@@ -59,7 +59,7 @@ class SaleRepository(BaseRepository):
                     datetime.now(), datetime.now(), b'checksum_placeholder'
                 ))
                 
-                # Obtener el ID generado por MySQL
+                # Obtener el Id generado por MySQL
                 sale_id = cursor.lastrowid
                 
                 # Actualizar referencia con el sale_id real
@@ -343,3 +343,52 @@ class SaleRepository(BaseRepository):
         #Manejo de errores en caso de que no se obtengan los totales de ventas por comercio
         except Exception as e:
             raise Exception(f"Error calculando totales: {str(e)}")
+    
+    #Metodo para registrar una venta usando un stored procedure
+    def register_sale_via_procedure(self, commerce_id: int, product_name: str,
+                                quantity: int, amount_paid: float,
+                                payment_method: str, payment_confirmation: str,
+                                reference_number: str, invoice_number: str,
+                                customer_name: str, discount_amount: float,
+                                cashier_user_id: int) -> Dict[str, Any]:
+        connection = None
+
+        try:
+            connection = self.get_connection()
+        
+            with connection.cursor() as cursor:
+                
+                # Preparar la llamada con placeholders para OUT params
+                
+                cursor.execute("""
+                    CALL registerSale(
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                        @p_sale_id, @p_message
+                    )
+                """, (
+                    commerce_id, product_name, quantity, amount_paid,
+                    payment_method, payment_confirmation, reference_number,
+                    invoice_number, customer_name, discount_amount, cashier_user_id
+                ))
+            
+                # Obtener los valores OUT
+                cursor.execute("SELECT @p_sale_id, @p_message")
+                result = cursor.fetchone()
+            
+            connection.commit()
+        
+            return {
+                'success': True,
+                'sale_id': result['@p_sale_id'],
+                'message': result['@p_message']
+            }
+        
+        except Exception as e:
+            if connection:
+                connection.rollback()
+            self.logger.error(f"Error en registerSale procedure: {str(e)}")
+            raise Exception(f"Error llamando stored procedure: {str(e)}")
+    
+        finally:
+            if connection:
+                connection.close()

@@ -1,6 +1,6 @@
 """
 Test completo para Settlement Service
-RESPONSABLE: Christopher
+
 """
 import logging
 from datetime import date
@@ -16,14 +16,14 @@ def test_settlement_service_initialization():
     
     try:
         service = SettlementService()
-        print(f"✅ Settlement Service creado correctamente")
-        print(f"✅ Settlement Repository: {type(service.settlement_repository)}")
-        print(f"✅ Sale Repository: {type(service.sale_repository)}")
-        print(f"✅ Base Repository: {type(service.base_repository)}")
-        print("✅ TEST 1 PASADO")
+        print(f" Settlement Service creado correctamente")
+        print(f" Settlement Repository: {type(service.settlement_repository)}")
+        print(f" Sale Repository: {type(service.sale_repository)}")
+        print(f" Base Repository: {type(service.base_repository)}")
+        print(" TEST 1 PASADO")
         return True
     except Exception as e:
-        print(f"❌ TEST 1 FALLÓ: {str(e)}")
+        print(f" TEST 1 FALLÓ: {str(e)}")
         return False
 
 def test_calculate_settlement_preview():
@@ -40,14 +40,14 @@ def test_calculate_settlement_preview():
         year = today.year
         month = today.month
         
-        print(f"📄 Calculando preview para {year}-{month:02d}...")
+        print(f" Calculando preview para {year}-{month:02d}...")
         preview = service.calculate_settlement_preview(
             commerce_id=2,
             year=year,
             month=month
         )
         
-        print(f"✅ Preview calculado:")
+        print(f" Preview calculado:")
         print(f"   Comercio: {preview['commerce_name']}")
         print(f"   Período: {preview['period']}")
         print(f"   Ventas: {preview['preview']['sales_count']} transacciones")
@@ -57,11 +57,11 @@ def test_calculate_settlement_preview():
         print(f"   Liquidación: ₡{preview['preview']['settlement_amount']:,.2f}")
         print(f"   Puede liquidar: {preview['can_settle']}")
         
-        print("✅ TEST 2 PASADO")
+        print(" TEST 2 PASADO")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 2 FALLÓ: {str(e)}")
+        print(f" TEST 2 FALLÓ: {str(e)}")
         return False
 
 def test_create_monthly_settlement():
@@ -82,7 +82,7 @@ def test_create_monthly_settlement():
             year = today.year
             month = today.month - 1
         
-        print(f"📄 Creando liquidación para {year}-{month:02d}...")
+        print(f" Creando liquidación para {year}-{month:02d}...")
         
         try:
             result = service.create_monthly_settlement(
@@ -92,7 +92,7 @@ def test_create_monthly_settlement():
                 created_by_user_id=1
             )
             
-            print(f"✅ Liquidación creada:")
+            print(f" Liquidación creada:")
             print(f"   Settlement ID: {result['settlement_id']}")
             print(f"   Comercio: {result['commerce_name']}")
             print(f"   Período: {result['period']['start_date']} - {result['period']['end_date']}")
@@ -100,19 +100,19 @@ def test_create_monthly_settlement():
             print(f"   Comisión: ₡{result['financial_summary']['commission_amount']:,.2f}")
             print(f"   Liquidación: ₡{result['financial_summary']['settlement_amount']:,.2f}")
             
-            print("✅ TEST 3 PASADO")
+            print(" TEST 3 PASADO")
             return True
             
         except ValueError as ve:
             if "No elegible" in str(ve) or "Ya existe" in str(ve):
-                print(f"⚠️ {str(ve)}")
-                print("✅ TEST 3 SALTADO: Ya existe liquidación (normal)")
+                print(f" {str(ve)}")
+                print(" TEST 3 SALTADO: Ya existe liquidación (normal)")
                 return True
             else:
                 raise ve
         
     except Exception as e:
-        print(f"❌ TEST 3 FALLÓ: {str(e)}")
+        print(f" TEST 3 FALLÓ: {str(e)}")
         return False
 
 def test_get_settlement_history():
@@ -124,13 +124,13 @@ def test_get_settlement_history():
     try:
         service = SettlementService()
         
-        print("📄 Obteniendo historial...")
+        print(" Obteniendo historial...")
         history = service.get_settlement_history(
             commerce_id=2,
             limit=5
         )
         
-        print(f"✅ Historial obtenido:")
+        print(f" Historial obtenido:")
         print(f"   Comercio: {history['commerce_name']}")
         print(f"   Liquidaciones: {history['settlements_count']}")
         print(f"   Total acumulado: ₡{history['total_accumulated']:,.2f}")
@@ -141,11 +141,11 @@ def test_get_settlement_history():
                 print(f"   {i+1}. Período: {settlement['period_start']} - {settlement['period_end']}")
                 print(f"      Monto: ₡{settlement['settlement_amount']:,.2f}")
         
-        print("✅ TEST 4 PASADO")
+        print(" TEST 4 PASADO")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 4 FALLÓ: {str(e)}")
+        print(f" TEST 4 FALLÓ: {str(e)}")
         return False
 
 def test_validations():
@@ -158,7 +158,7 @@ def test_validations():
         service = SettlementService()
         
         # Test 1: Mes inválido
-        print("📄 Probando mes inválido...")
+        print(" Probando mes inválido...")
         try:
             service.create_monthly_settlement(
                 commerce_id=2,
@@ -166,13 +166,13 @@ def test_validations():
                 month=13,  # Inválido
                 created_by_user_id=1
             )
-            print("❌ Debería fallar con mes inválido")
+            print(" Debería fallar con mes inválido")
             return False
         except ValueError as e:
-            print(f"✅ Validación correcta: {str(e)}")
+            print(f" Validación correcta: {str(e)}")
         
         # Test 2: Año fuera de rango
-        print("📄 Probando año inválido...")
+        print(" Probando año inválido...")
         try:
             service.create_monthly_settlement(
                 commerce_id=2,
@@ -180,16 +180,16 @@ def test_validations():
                 month=1,
                 created_by_user_id=1
             )
-            print("❌ Debería fallar con año inválido")
+            print(" Debería fallar con año inválido")
             return False
         except ValueError as e:
-            print(f"✅ Validación correcta: {str(e)}")
+            print(f" Validación correcta: {str(e)}")
         
-        print("✅ TEST 5 PASADO: Validaciones funcionan")
+        print(" TEST 5 PASADO: Validaciones funcionan")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 5 FALLÓ: {str(e)}")
+        print(f" TEST 5 FALLÓ: {str(e)}")
         return False
 
 def test_get_settlement_details():
@@ -205,29 +205,29 @@ def test_get_settlement_details():
         history = service.get_settlement_history(commerce_id=2, limit=1)
         
         if not history['settlements']:
-            print("⚠️ No hay liquidaciones para probar")
-            print("✅ TEST 6 SALTADO: Sin datos")
+            print(" No hay liquidaciones para probar")
+            print(" TEST 6 SALTADO: Sin datos")
             return True
         
         settlement_id = history['settlements'][0]['settlement_id']
         
-        print(f"📄 Obteniendo detalles de liquidación {settlement_id}...")
+        print(f" Obteniendo detalles de liquidación {settlement_id}...")
         details = service.get_settlement_details(settlement_id)
         
         if details:
-            print(f"✅ Detalles obtenidos:")
+            print(f" Detalles obtenidos:")
             print(f"   Settlement ID: {details['settlement']['settlement_id']}")
             print(f"   Comercio: {details['settlement']['commerce_name']}")
             print(f"   Monto: ₡{details['settlement']['settlement_amount']:,.2f}")
             print(f"   Ventas en período: {details['sales_count']}")
-            print("✅ TEST 6 PASADO")
+            print(" TEST 6 PASADO")
             return True
         else:
-            print("❌ No se pudieron obtener detalles")
+            print(" No se pudieron obtener detalles")
             return False
         
     except Exception as e:
-        print(f"❌ TEST 6 FALLÓ: {str(e)}")
+        print(f" TEST 6 FALLÓ: {str(e)}")
         return False
 
 def test_settlement_metrics():
@@ -246,7 +246,7 @@ def test_settlement_metrics():
             month=today.month
         )
         
-        print(f"✅ Métricas calculadas:")
+        print(f" Métricas calculadas:")
         
         if 'metrics' in preview and preview['metrics']:
             metrics = preview['metrics']
@@ -255,16 +255,16 @@ def test_settlement_metrics():
             print(f"   Tasa efectiva: {metrics.get('effective_commission_rate', 0):.2f}%")
             print(f"   Tipo: {metrics.get('settlement_type', 'N/A')}")
         
-        print("✅ TEST 7 PASADO")
+        print(" TEST 7 PASADO")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 7 FALLÓ: {str(e)}")
+        print(f" TEST 7 FALLÓ: {str(e)}")
         return False
 
 def main():
     """Ejecutar todos los tests del Settlement Service"""
-    print("🧪 INICIANDO TESTS DE SETTLEMENT SERVICE")
+    print(" INICIANDO TESTS DE SETTLEMENT SERVICE")
     print("=" * 70)
     
     tests = [
@@ -285,22 +285,22 @@ def main():
             if test_func():
                 passed += 1
         except Exception as e:
-            print(f"❌ ERROR INESPERADO en {test_name}: {str(e)}")
+            print(f" ERROR INESPERADO en {test_name}: {str(e)}")
     
     # Resumen final
     print("\n" + "="*70)
-    print("📊 RESUMEN DE TESTS - SETTLEMENT SERVICE")
+    print(" RESUMEN DE TESTS - SETTLEMENT SERVICE")
     print("="*70)
-    print(f"✅ Tests pasados: {passed}/{total}")
-    print(f"❌ Tests fallidos: {total - passed}/{total}")
+    print(f" Tests pasados: {passed}/{total}")
+    print(f" Tests fallidos: {total - passed}/{total}")
     
     if passed == total:
-        print("\n🎉 ¡TODOS LOS TESTS PASARON!")
-        print("✅ Settlement Service está listo para usar")
-        print("✅ Puedes proceder con Stored Procedures")
+        print("\n ¡TODOS LOS TESTS PASARON!")
+        print(" Settlement Service está listo para usar")
+        print(" Puedes proceder con Stored Procedures")
     else:
-        print(f"\n⚠️ {total - passed} tests fallaron")
-        print("🔧 Revisa los errores antes de continuar")
+        print(f"\n {total - passed} tests fallaron")
+        print(" Revisa los errores antes de continuar")
     
     print("="*70)
 

@@ -127,123 +127,114 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS settleCommerce$$
 
 CREATE PROCEDURE settleCommerce(
-    -- Parametros 
     IN p_commerce_name VARCHAR(60),
     IN p_location_name VARCHAR(60),
     IN p_user_id INT,
-    
-    -- Salidas
     OUT p_settlement_id INT,
     OUT p_message VARCHAR(500)
 )
-proc_label: BEGIN  
+proc_label: BEGIN
     DECLARE v_commerce_id INT;
+    DECLARE v_mercado_building_id INT;
+    DECLARE v_contract_id INT;
+    DECLARE v_existing_settlement_id INT;
     DECLARE v_total_sales DECIMAL(10,2);
-    DECLARE v_commission DECIMAL(10,2);
-    DECLARE v_rent DECIMAL(10,2) DEFAULT 50000;
-    DECLARE v_settlement DECIMAL(10,2);
-    DECLARE v_error INT DEFAULT 0;
+    DECLARE v_base_rent DECIMAL(10,2);
+    DECLARE v_commission_pct DECIMAL(5,2);
+    DECLARE v_commission_amt DECIMAL(10,2);
+    DECLARE v_settlement_amt DECIMAL(10,2);
+    DECLARE v_period_start DATE;
+    DECLARE v_period_end DATE;
     
-    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-        SET v_error = 1;
         ROLLBACK;
+        SET p_settlement_id = NULL;
+        SET p_message = 'ERROR: Fallo en la liquidación';
     END;
     
     START TRANSACTION;
     
-    -- Obtener ID del comercio
-    SELECT IdCommerce INTO v_commerce_id
-    FROM MKCommerces
-    WHERE name = p_commerce_name
+    -- Calcular período del mes actual
+    SET v_period_start = DATE_FORMAT(CURDATE(), '%Y-%m-01');
+    SET v_period_end = LAST_DAY(CURDATE());
+    
+    -- Obtener IDs del comercio y mercado
+    SELECT c.IdCommerce, mpb.IdMercadoPerBuilding
+    INTO v_commerce_id, v_mercado_building_id
+    FROM MKCommerces c
+    INNER JOIN MKInventory inv ON c.IdCommerce = inv.IDCommerceFK
+    INNER JOIN MKMercadoPerBuilding mpb ON inv.IDMercadoPerBuilding = mpb.IdMercadoPerBuilding
+    INNER JOIN MKBuilding b ON mpb.IDBuildingFK = b.IdBuilding
+    WHERE c.name = p_commerce_name AND b.name = p_location_name
     LIMIT 1;
     
     IF v_commerce_id IS NULL THEN
-        SET p_message = CONCAT('Error: Comercio "', p_commerce_name, '" no encontrado');
+        SET p_settlement_id = NULL;
+        SET p_message = CONCAT('ADVERTENCIA: Comercio "', p_commerce_name, '" no encontrado');
         ROLLBACK;
         LEAVE proc_label;
     END IF;
     
-    -- Verificar si ya fue liquidado este mes
-    IF EXISTS(
-        SELECT 1 FROM MKCommerceSettlement
-        WHERE IDCommerceFK6 = v_commerce_id
-        AND MONTH(settlementPeriodStart) = MONTH(NOW())
-        AND YEAR(settlementPeriodStart) = YEAR(NOW())
-    ) THEN
-        SET p_message = 'Error: Comercio ya liquidado este mes';
+    -- Verificar liquidacion existente
+    SELECT IdCommerceSettlement INTO v_existing_settlement_id
+    FROM MKCommerceSettlement
+    WHERE IDCommerceFK6 = v_commerce_id
+      AND DATE_FORMAT(settlementPeriodStart, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+    LIMIT 1;
+    
+    IF v_existing_settlement_id IS NOT NULL THEN
+        SET p_settlement_id = v_existing_settlement_id;
+        SET p_message = CONCAT('INFO: Ya liquidado. ID: ', v_existing_settlement_id);
+        COMMIT;
+        LEAVE proc_label;
+    END IF;
+    
+    -- Obtener terminos del contrato
+    SELECT cpc.baseMonthlyRent, cpc.commisionPercentage, cpc.IDContractFK
+    INTO v_base_rent, v_commission_pct, v_contract_id
+    FROM MKContractsPerCommerces cpc
+    WHERE cpc.IDCommerceFK = v_commerce_id AND cpc.isCurrent = 1
+    LIMIT 1;
+    
+    IF v_contract_id IS NULL THEN
+        SET p_settlement_id = NULL;
+        SET p_message = 'ERROR: No hay contrato activo';
         ROLLBACK;
         LEAVE proc_label;
     END IF;
     
-    -- Calcular ventas del mes
+    -- Calcular ventas del periodo
     SELECT COALESCE(SUM(totalAmount), 0) INTO v_total_sales
     FROM MKSales
     WHERE IDCommerceFK2 = v_commerce_id
-    AND MONTH(saleDate) = MONTH(NOW())
-    AND YEAR(saleDate) = YEAR(NOW())
-    AND saleStatus = 'COMPLETED';
+      AND DATE(saleDate) BETWEEN v_period_start AND v_period_end
+      AND saleStatus = 'COMPLETED';
     
-    -- Calcular liquidación
-    SET v_commission = v_total_sales * 0.10;  -- 10%
-    SET v_settlement = v_commission - v_rent;
+    -- Calcular comisión y liquidacion
+    SET v_commission_amt = v_total_sales * (v_commission_pct / 100);
+    SET v_settlement_amt = v_commission_amt - v_base_rent;
     
     -- Crear liquidacion
     INSERT INTO MKCommerceSettlement (
-        IDCommerceFK6, totalSalesAmount, settlementPeriodStart,
-        settlementPeriodEnd, totalRent, totalCommission,
-        totalSettlementAmount, settlementDate, createdAt, UpdatedAt,
-        MKContractsPerCommerces_IdContractPerCommerce,
+        IDCommerceFK6, totalSalesAmount, settlementPeriodStart, settlementPeriodEnd,
+        totalRent, totalCommission, totalSettlementAmount, settlementDate,
+        createdAt, UpdatedAt, MKContractsPerCommerces_IdContractPerCommerce,
         MKMercadoPerBuilding_IdMercadoPerBuilding
     ) VALUES (
-        v_commerce_id, v_total_sales, DATE_FORMAT(NOW(), '%Y-%m-01'),
-        LAST_DAY(NOW()), v_rent, v_commission,
-        v_settlement, CURDATE(), NOW(), NOW(), 1, 1
+        v_commerce_id, v_total_sales, v_period_start, v_period_end,
+        v_base_rent, v_commission_amt, v_settlement_amt, CURDATE(),
+        NOW(), NOW(), v_contract_id, v_mercado_building_id
     );
     
     SET p_settlement_id = LAST_INSERT_ID();
+    SET p_message = CONCAT('SUCCESS: ID:', p_settlement_id, 
+                          '|Ventas:₡', FORMAT(v_total_sales, 2),
+                          '|Comisión:₡', FORMAT(v_commission_amt, 2),
+                          '|Renta:₡', FORMAT(v_base_rent, 2),
+                          '|Liquidación:₡', FORMAT(v_settlement_amt, 2));
     
-    -- Log
-    INSERT INTO MKLogs (
-        description, postTime, computer, username, trace,
-        referenceID1, referenceID2, value1, value2, checksum,
-        lastUpdate, IDLogSeverityFK, IDLogSourceFK, IDLogTypeFK,
-        IDUserFK2, createdAt
-    ) VALUES (
-        CONCAT('Liquidación creada: ', p_settlement_id), NOW(), 'SP',
-        CONCAT('user_', p_user_id), 'settleCommerce',
-        p_settlement_id, v_commerce_id, 
-        CONCAT('Ventas: ', v_total_sales), CONCAT('Settlement: ', v_settlement),
-        SHA2(CONCAT('log_', p_settlement_id), 256), NOW(), 1, 4, 2,
-        p_user_id, NOW()
-    );
-    
-    IF v_error = 0 THEN
-        COMMIT;
-        SET p_message = CONCAT(
-            'Liquidacion exitosa | Comercio: ', p_commerce_name,
-            ' | Ventas: ₡', FORMAT(v_total_sales, 2),
-            ' | Comisión: ₡', FORMAT(v_commission, 2),
-            ' | Renta: ₡', FORMAT(v_rent, 2),
-            ' | Total: ₡', FORMAT(v_settlement, 2),
-            ' | ID: ', p_settlement_id
-        );
-    ELSE
-        SET p_message = 'Error al crear liquidacion';
-    END IF;
-    
+    COMMIT;
 END$$
 
 DELIMITER ;
-
-CALL settleCommerce(
-    'Café Central',     -- commerce_name
-    'Local 101',        -- location_name
-    1,                  -- user_id
-    @settlement_id,     -- OUT
-    @message            -- OUT
-);
-
-SELECT @settlement_id, @message;
-
-SELECT * FROM MKCommerceSettlement WHERE IdCommerceSettlement = @settlement_id;

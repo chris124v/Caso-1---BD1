@@ -321,3 +321,71 @@ class SettlementRepository(BaseRepository): #Hereda de BaseRepository para usar 
         #Manejo de errores en caso de que no se puedan calcular las ventas
         except Exception as e:
             raise Exception(f"Error calculando ventas: {str(e)}")
+    
+    #Liquida comercio usando el stored procedure settleCommerce
+    def settle_commerce_via_procedure(self, commerce_name: str, location_name: str, user_id: int) -> Dict[str, Any]:
+    
+        connection = None
+
+        try:
+            connection = self.get_connection()
+    
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    CALL settleCommerce(%s, %s, %s, @p_settlement_id, @p_message)
+                """, (commerce_name, location_name, user_id))
+        
+                cursor.execute("SELECT @p_settlement_id, @p_message")
+                result = cursor.fetchone()
+        
+            connection.commit()
+        
+            settlement_id = result['@p_settlement_id']
+            message = result['@p_message']
+        
+            # Analizar tipo de respuesta segun prefijo del mensaje
+            if message.startswith('INFO:'):
+
+                # Ya estaba liquidado
+                return {
+                    'success': True,
+                    'settlement_id': settlement_id,
+                    'message': message.replace('INFO: ', ''),
+                    'already_settled': True,
+                    'action_taken': 'already_exists'
+                }
+        
+            elif message.startswith('SUCCESS:'):
+                # Liquidación creada exitosamente
+                return {
+                    'success': True,
+                    'settlement_id': settlement_id,
+                    'message': f'Liquidacion creada exitosamente. ID: {settlement_id}',
+                    'already_settled': False,
+                    'action_taken': 'created'
+                }
+        
+            else:  # Error u otro mensaje de advertencia
+                return {
+                    'success': False,
+                    'settlement_id': None,
+                    'message': message,
+                    'already_settled': False,
+                    'action_taken': 'error'
+                }
+    
+        except Exception as e:
+            if connection:
+                connection.rollback()
+            self.logger.error(f"Error en settleCommerce: {str(e)}")
+            return {
+                'success': False,
+                'settlement_id': None,
+                'message': f"Error: {str(e)}",
+                'already_settled': False,
+                'action_taken': 'exception'
+            }
+    
+        finally:
+            if connection:
+                connection.close()

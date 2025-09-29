@@ -16,7 +16,7 @@ def main():
     
     # Test basico de conexion
     if db_config.test_connection():
-        print("Conexión exitosa!")
+        print("Conexion exitosa")
         
         # Obtener informacion de la base de datos
         print("\nInformacion de la base de datos:")

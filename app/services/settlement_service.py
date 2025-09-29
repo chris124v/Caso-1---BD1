@@ -1,7 +1,7 @@
 """
 Service layer para operaciones de liquidación mensual
 
-Este servicio implementa la lógica de negocio para liquidaciones mensuales,
+Este servicio implementa la logica de negocio para liquidaciones mensuales,
 calculando comisiones, rentas y generando reportes financieros.
 
 """
@@ -235,7 +235,7 @@ class SettlementService:
             commission = Decimal(str(preview['commission_amount']))
             base_rent = Decimal(str(preview['base_rent']))
             
-            # Calcular porcentaje de comisión sobre renta
+            # Calcular porcentaje de comision sobre renta
             if base_rent > 0:
                 commission_vs_rent = (commission / base_rent) * 100
             else:

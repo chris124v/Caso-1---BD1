@@ -409,9 +409,8 @@ BEGIN
     
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
     
-    -- =====================================================
-    -- GENERAR VENTAS PARA CADA COMERCIO Y CADA MES
-    -- =====================================================
+    
+    -- Generar ventas para cada comercio y para cada mes
     
     OPEN comercios;
     
@@ -421,9 +420,9 @@ BEGIN
             LEAVE comercio_loop;
         END IF;
         
-        -- =====================================================
-        -- MES 1: JUNIO 2024
-        -- =====================================================
+        
+        -- Mes 1: Junio 2024
+        
         SET month_start = '2024-06-01';
         SET month_end = '2024-06-30';
         SET sales_target = 50 + FLOOR(RAND() * 21); -- Random entre 50-70
@@ -438,10 +437,10 @@ BEGIN
             SET sale_date = DATE_ADD(sale_date, INTERVAL sale_hour HOUR);
             SET sale_date = DATE_ADD(sale_date, INTERVAL sale_minute MINUTE);
             
-            -- Generar número de referencia único
+            -- Generamos numero de referencia único
             SET reference_number = CONCAT('VTA-', LPAD(commerce_id, 4, '0'), '-', LPAD(current_sale_id, 6, '0'), '-', DATE_FORMAT(sale_date, '%Y%m%d%H%i%s'));
             
-            -- Método de pago aleatorio
+            -- Metodos de pago aleatorio
             SET payment_method = 1 + FLOOR(RAND() * 4);
             
             -- Generar productos para esta venta (1-4 productos por venta)
@@ -463,7 +462,7 @@ BEGIN
             
             -- Generar detalles de productos
             WHILE i < product_count DO
-                -- Seleccionar producto aleatorio según comercio
+                -- Seleccionar producto aleatorio segun comercio
                 IF commerce_id = 2 THEN -- Café Central
                     SET random_product_id = 1 + FLOOR(RAND() * 6); -- Productos 1-6
                 ELSEIF commerce_id = 4 THEN -- Burger Express
@@ -544,16 +543,16 @@ BEGIN
             SET sales_created = sales_created + 1;
         END WHILE;
         
-        -- =====================================================
-        -- MES 2: JULIO 2024
-        -- =====================================================
+        
+        -- Mes 2: Julio 2024
+        
         SET month_start = '2024-07-01';
         SET month_end = '2024-07-31';
         SET sales_target = 50 + FLOOR(RAND() * 21);
         SET sales_created = 0;
         
         WHILE sales_created < sales_target DO
-            -- (Repetir misma lógica para julio)
+            -- (Repetimos misma logica para julio)
             SET sale_day = 1 + FLOOR(RAND() * 31);
             SET sale_hour = 7 + FLOOR(RAND() * 14);
             SET sale_minute = FLOOR(RAND() * 60);
@@ -641,9 +640,9 @@ BEGIN
             SET sales_created = sales_created + 1;
         END WHILE;
         
-        -- =====================================================
-        -- MES 3: AGOSTO 2024 (Repetir lógica)
-        -- =====================================================
+        
+        -- Mes 3: Agosto 2024 
+        
         SET month_start = '2024-08-01';
         SET month_end = '2024-08-31';
         SET sales_target = 50 + FLOOR(RAND() * 21);
@@ -737,9 +736,9 @@ BEGIN
             SET sales_created = sales_created + 1;
         END WHILE;
         
-        -- =====================================================
-        -- MES 4: SEPTIEMBRE 2024 (Repetir lógica)
-        -- =====================================================
+        
+        -- Mes 4: Septiembre 2024 
+
         SET month_start = '2024-09-01';
         SET month_end = '2024-09-30';
         SET sales_target = 50 + FLOOR(RAND() * 21);

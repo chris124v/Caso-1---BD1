@@ -71,7 +71,7 @@ class SaleService:
     
         #ValueError específicamente para validaciones
         except ValueError as ve:
-            self.logger.warning(f"Validacion falló: {str(ve)}")
+            self.logger.warning(f"Validacion fallo: {str(ve)}")
             raise ve  
     
         # Capturamos cualquier otro error como Exception generica

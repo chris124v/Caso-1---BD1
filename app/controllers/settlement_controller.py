@@ -1,25 +1,28 @@
-
-
+"""
+Settlement Controller para orquestar liquidaciones
+"""
 from typing import Dict, Any
-from app.services.settlement_service import SettlementService
-from app.models.request_models import SettleCommerceRequest
-from app.models.response_models import SettlementResponse, ErrorResponse
 import logging
 from datetime import datetime
 
+from app.services.settlement_service import SettlementService
+from app.models.request_models import SettleCommerceRequest
+from app.models.response_models import SettlementResponse, ErrorResponse
+
+# Controlador para la gestion de liquidaciones
 class SettlementController:
-    """Controlador para orquestrar la lógica de negocio de liquidaciones"""
     
+    # Inicialización del controlador
     def __init__(self):
         self.settlement_service = SettlementService()
         self.logger = logging.getLogger(__name__)
     
+    #Procesa la liquidación de un comercio
     def settle_commerce(self, settlement_request: SettleCommerceRequest) -> Dict[str, Any]:
-        """
-        Orquestar la liquidación de un comercio
-        """
+        
+        # Logging
         try:
-            self.logger.info(f"Iniciando liquidación para comercio: {settlement_request.commerce_name}")
+            self.logger.info(f"Iniciando liquidacion para comercio: {settlement_request.store_name}")
             
             # Validar datos básicos
             validation_result = self._validate_settlement_request(settlement_request)
@@ -29,214 +32,176 @@ class SettlementController:
                     error_code="REQUEST_VALIDATION_FAILED"
                 )
             
-            # Procesar la liquidación
-            result = self.settlement_service.process_settlement(settlement_request)
+            # Obtener commerce_id
+            commerce_id = self._get_commerce_id_by_name(settlement_request.store_name)
             
+            # Obtener mes y año actuales
+            today = datetime.now()
+            
+            # Llamar al servicio para crear liquidación
+            result = self.settlement_service.create_monthly_settlement(
+                commerce_id=commerce_id,
+                year=today.year,
+                month=today.month,
+                created_by_user_id=1  # TODO: Obtener del contexto
+            )
+            
+            #Si la liquidación fue exitosa regresar resultado
             if result['success']:
                 return self._create_success_response(result)
             else:
                 return self._create_error_response(
-                    message=result['message'],
-                    error_code=result.get('error_code', 'SETTLEMENT_PROCESSING_FAILED')
+                    message=result.get('message', 'Error en liquidación'),
+                    error_code='SETTLEMENT_ERROR'
                 )
-                
+        
+        # Manejo de errores
+        except ValueError as ve:
+            self.logger.warning(f"Error de validacion: {str(ve)}")
+            return self._create_error_response(
+                message=str(ve),
+                error_code="VALIDATION_ERROR"
+            )
+            
         except Exception as e:
             error_message = f"Error en controlador de liquidaciones: {str(e)}"
-            self.logger.error(error_message)
+            self.logger.error(error_message, exc_info=True)
             return self._create_error_response(
                 message=error_message,
                 error_code="CONTROLLER_ERROR"
             )
     
-    def check_settlement_status(self, commerce_name: str, location_name: str) -> Dict[str, Any]:
-        """
-        Verificar estado de liquidación de un comercio
-        """
+    # Obtener detalles de una liquidación por ID o en este caso una liquidación específica
+    def get_settlement_by_id(self, settlement_id: int) -> Dict[str, Any]:
+        
         try:
-            self.logger.info(f"Verificando estado de liquidación: {commerce_name} - {location_name}")
+            self.logger.info(f"Obteniendo liquidación ID: {settlement_id}")
             
-            # Validar parámetros
-            if not commerce_name or not commerce_name.strip():
-                return self._create_error_response(
-                    message="El nombre del comercio es requerido",
-                    error_code="MISSING_COMMERCE_NAME"
-                )
+            settlement = self.settlement_service.get_settlement_details(settlement_id)
             
-            if not location_name or not location_name.strip():
-                return self._create_error_response(
-                    message="El nombre del local/edificio es requerido",
-                    error_code="MISSING_LOCATION_NAME"
-                )
+            # Si no se encuentra la liquidación
+            if not settlement:
+                return {
+                    "success": False,
+                    "message": f"Liquidación con ID {settlement_id} no encontrada",
+                    "timestamp": datetime.now().isoformat(),
+                    "error_code": "SETTLEMENT_NOT_FOUND"
+                }
             
-            # Verificar estado
-            status = self.settlement_service.settlement_repository.check_settlement_status(
-                commerce_name, location_name
-            )
-            
+            # Regresar detalles de la liquidación si se encuentra
             return {
-                'success': True,
-                'message': 'Estado de liquidación obtenido exitosamente',
-                'data': status,
-                'timestamp': datetime.now().isoformat()
+                "success": True,
+                "message": "Detalles de liquidación obtenidos exitosamente",
+                "timestamp": datetime.now().isoformat(),
+                "data": settlement
             }
-            
+        
+        #Error handling
         except Exception as e:
-            error_message = f"Error verificando estado de liquidación: {str(e)}"
-            self.logger.error(error_message)
-            return self._create_error_response(
-                message=error_message,
-                error_code="STATUS_CHECK_ERROR"
-            )
+            self.logger.error(f"Error obteniendo liquidación: {str(e)}", exc_info=True)
+            return {
+                "success": False,
+                "message": "Error al obtener detalles de liquidación",
+                "timestamp": datetime.now().isoformat(),
+                "error_code": "SETTLEMENT_DETAILS_ERROR",
+                "error_details": {"error": str(e)}
+            }
     
+    #Obtiene historial de liquidaciones de un comercio
     def get_settlement_history(self, commerce_name: str, limit: int = 10) -> Dict[str, Any]:
-        """
-        Obtener historial de liquidaciones de un comercio
-        """
+        
         try:
-            self.logger.info(f"Obteniendo historial de liquidaciones para: {commerce_name}")
+            self.logger.info(f"Obteniendo historial para: {commerce_name}")
             
-            # Validar parámetros
+            #Si no se proporciona nombre del comercio
             if not commerce_name or not commerce_name.strip():
                 return self._create_error_response(
                     message="El nombre del comercio es requerido",
                     error_code="MISSING_COMMERCE_NAME"
                 )
             
-            if limit <= 0 or limit > 100:
-                limit = 10  # Valor por defecto
+            commerce_id = self._get_commerce_id_by_name(commerce_name)
             
-            # Obtener historial
-            history = self.settlement_service.settlement_repository.get_settlement_history(
-                commerce_name, limit
+            history = self.settlement_service.get_settlement_history(
+                commerce_id=commerce_id,
+                limit=limit
             )
             
+            # Regresar historial
             return {
                 'success': True,
-                'message': 'Historial de liquidaciones obtenido exitosamente',
-                'data': {
-                    'commerce_name': commerce_name,
-                    'settlements': history,
-                    'count': len(history)
-                },
+                'message': 'Historial obtenido exitosamente',
+                'data': history,
                 'timestamp': datetime.now().isoformat()
             }
-            
+        
+        #Error handling DEL historial
         except Exception as e:
-            error_message = f"Error obteniendo historial de liquidaciones: {str(e)}"
-            self.logger.error(error_message)
+            error_message = f"Error obteniendo historial: {str(e)}"
+            self.logger.error(error_message, exc_info=True)
             return self._create_error_response(
                 message=error_message,
                 error_code="HISTORY_RETRIEVAL_ERROR"
             )
     
-    def get_settlement_dashboard(self) -> Dict[str, Any]:
-        """
-        Obtener dashboard de liquidaciones del mes actual
-        """
+    # Calcula preview de liquidación sin crearla directamente
+    def calculate_settlement_preview(self, commerce_name: str) -> Dict[str, Any]:
+        
+        #Calculo del preview
         try:
-            self.logger.info("Generando dashboard de liquidaciones")
+            self.logger.info(f"Calculando preview para: {commerce_name}")
             
-            # Obtener dashboard
-            dashboard = self.settlement_service.get_settlement_dashboard()
+            commerce_id = self._get_commerce_id_by_name(commerce_name)
+            today = datetime.now()
             
-            if dashboard['success']:
-                return {
-                    'success': True,
-                    'message': 'Dashboard generado exitosamente',
-                    'data': dashboard,
-                    'timestamp': datetime.now().isoformat()
-                }
-            else:
-                return self._create_error_response(
-                    message=dashboard['message'],
-                    error_code="DASHBOARD_GENERATION_FAILED"
-                )
-                
-        except Exception as e:
-            error_message = f"Error generando dashboard: {str(e)}"
-            self.logger.error(error_message)
-            return self._create_error_response(
-                message=error_message,
-                error_code="DASHBOARD_ERROR"
+            # Llamar al servicio para calcular preview
+            preview = self.settlement_service.calculate_settlement_preview(
+                commerce_id=commerce_id,
+                year=today.year,
+                month=today.month
             )
-    
-    def get_monthly_settlements(self) -> Dict[str, Any]:
-        """
-        Obtener todas las liquidaciones del mes actual
-        """
-        try:
-            self.logger.info("Obteniendo liquidaciones del mes actual")
             
-            settlements = self.settlement_service.settlement_repository.get_current_month_settlements()
-            
-            # Calcular estadísticas básicas
-            total_settlements = len(settlements)
-            total_sales = sum(s['total_sales'] for s in settlements)
-            total_commission = sum(s['total_commission'] for s in settlements)
-            total_rent = sum(s['total_rent'] for s in settlements)
-            
+            # Regresar preview calculado
             return {
                 'success': True,
-                'message': 'Liquidaciones del mes obtenidas exitosamente',
-                'data': {
-                    'period': f"{datetime.now().strftime('%Y-%m')}",
-                    'summary': {
-                        'total_settlements': total_settlements,
-                        'total_sales_amount': total_sales,
-                        'total_commission': total_commission,
-                        'total_rent': total_rent,
-                        'average_sales': total_sales / total_settlements if total_settlements > 0 else 0
-                    },
-                    'settlements': settlements
-                },
+                'message': 'Preview calculado exitosamente',
+                'data': preview,
                 'timestamp': datetime.now().isoformat()
             }
-            
+        
+        # Manejo de errores
         except Exception as e:
-            error_message = f"Error obteniendo liquidaciones mensuales: {str(e)}"
-            self.logger.error(error_message)
+            error_message = f"Error calculando preview: {str(e)}"
+            self.logger.error(error_message, exc_info=True)
             return self._create_error_response(
                 message=error_message,
-                error_code="MONTHLY_SETTLEMENTS_ERROR"
+                error_code="PREVIEW_CALCULATION_ERROR"
             )
     
+    # Metodos auxiliares
+    
+    # Validar request de liquidación
     def _validate_settlement_request(self, request: SettleCommerceRequest) -> Dict[str, Any]:
-        """Validar request de liquidación"""
         
-        if not request.commerce_name or not request.commerce_name.strip():
+        if not request.store_name or not request.store_name.strip():
             return {'valid': False, 'message': 'El nombre del comercio es requerido'}
         
         if not request.location_name or not request.location_name.strip():
             return {'valid': False, 'message': 'El nombre del local/edificio es requerido'}
         
-        if request.approved_by_user_id <= 0:
-            return {'valid': False, 'message': 'ID de usuario aprobador inválido'}
-        
         return {'valid': True, 'message': 'Validación exitosa'}
     
+    # Crear respuesta de éxito
     def _create_success_response(self, result: Dict[str, Any]) -> Dict[str, Any]:
-        """Crear respuesta de éxito estandarizada"""
         return {
             'success': True,
             'message': result.get('message', 'Liquidación procesada exitosamente'),
-            'data': {
-                'settlement_id': result.get('settlement_id'),
-                'commerce_name': result.get('commerce_name'),
-                'settlement_period': result.get('settlement_period'),
-                'total_sales_amount': result.get('total_sales_amount'),
-                'total_commission': result.get('total_commission'),
-                'total_rent': result.get('total_rent'),
-                'net_settlement_amount': result.get('net_settlement_amount'),
-                'already_settled': result.get('already_settled'),
-                'pre_settlement_analysis': result.get('pre_settlement_analysis'),
-                'settlement_metrics': result.get('settlement_metrics'),
-                'recommendations': result.get('recommendations')
-            },
+            'data': result,
             'timestamp': datetime.now().isoformat()
         }
     
+    # Crear respuesta de error estandarizada
     def _create_error_response(self, message: str, error_code: str, details: str = None) -> Dict[str, Any]:
-        """Crear respuesta de error estandarizada"""
         return {
             'success': False,
             'message': message,
@@ -244,3 +209,20 @@ class SettlementController:
             'details': details,
             'timestamp': datetime.now().isoformat()
         }
+    
+    #Obtiene el ID del comercio desde su nombre
+    def _get_commerce_id_by_name(self, commerce_name: str) -> int:
+        commerce_map = {
+            'Café Central': 2,
+            'Burger Express': 4,
+            'Pizza Corner': 10,
+            'El Buen Sabor': 1,
+            'Panadería Doña María': 3,
+            'Jugos Tropicales': 5
+        }
+        
+        commerce_id = commerce_map.get(commerce_name)
+        if not commerce_id:
+            raise ValueError(f"Comercio '{commerce_name}' no encontrado")
+        
+        return commerce_id

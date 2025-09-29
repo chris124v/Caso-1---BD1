@@ -1,6 +1,6 @@
 """
 Test completo para Settlement Repository
-RESPONSABLE: Christopher
+
 """
 import logging
 from datetime import datetime, date, timedelta
@@ -21,24 +21,24 @@ def test_settlement_repository_connection():
         repo = SettlementRepository()
         
         # Verificar herencia
-        print(f"✅ SettlementRepository creado correctamente")
-        print(f"✅ Commission percentage por defecto: {repo.default_commission_percentage}%")
-        print(f"✅ Base rent por defecto: ₡{repo.default_base_rent}")
+        print(f" SettlementRepository creado correctamente")
+        print(f" Commission percentage por defecto: {repo.default_commission_percentage}%")
+        print(f" Base rent por defecto: ₡{repo.default_base_rent}")
         
         # Verificar conexión
         connection = repo.get_connection()
-        print(f"✅ Conexión obtenida: {type(connection)}")
+        print(f" Conexión obtenida: {type(connection)}")
         connection.close()
         
         # Verificar acceso a table_id_mapping
         settlement_id_column = repo.table_id_mapping.get("MKCommerceSettlement")
-        print(f"✅ Mapeo de MKCommerceSettlement: {settlement_id_column}")
+        print(f" Mapeo de MKCommerceSettlement: {settlement_id_column}")
         
-        print("✅ TEST 1 PASADO: Configuración básica OK")
+        print(" TEST 1 PASADO: Configuración básica OK")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 1 FALLÓ: {str(e)}")
+        print(f" TEST 1 FALLÓ: {str(e)}")
         return False
 
 def test_required_tables():
@@ -58,16 +58,16 @@ def test_required_tables():
         for table in required_tables:
             try:
                 count = repo.execute_scalar(f"SELECT COUNT(*) FROM {table}")
-                print(f"✅ {table}: {count} registros")
+                print(f" {table}: {count} registros")
             except Exception as e:
-                print(f"❌ {table}: ERROR - {str(e)}")
+                print(f" {table}: ERROR - {str(e)}")
                 return False
         
-        print("✅ TEST 2 PASADO: Todas las tablas existen")
+        print(" TEST 2 PASADO: Todas las tablas existen")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 2 FALLÓ: {str(e)}")
+        print(f" TEST 2 FALLÓ: {str(e)}")
         return False
 
 def test_private_methods():
@@ -80,23 +80,23 @@ def test_private_methods():
         repo = SettlementRepository()
         
         # Test _check_existing_settlement
-        print("🔄 Probando _check_existing_settlement()...")
+        print(" Probando _check_existing_settlement()...")
         exists = repo._check_existing_settlement(
             commerce_id=999,  # ID que no existe
             period_start=date(2024, 10, 1),
             period_end=date(2024, 10, 31)
         )
-        print(f"✅ Liquidación inexistente: {exists} (debe ser False)")
+        print(f" Liquidación inexistente: {exists} (debe ser False)")
         
         # Test _get_contract_terms
-        print("🔄 Probando _get_contract_terms()...")
+        print(" Probando _get_contract_terms()...")
         terms = repo._get_contract_terms(commerce_id=1)
-        print(f"✅ Términos de contrato obtenidos:")
+        print(f" Términos de contrato obtenidos:")
         print(f"   Base rent: ₡{terms['base_rent']}")
         print(f"   Commission: {terms['commission_percentage']}%")
         
         # Test _get_period_sales
-        print("🔄 Probando _get_period_sales()...")
+        print(" Probando _get_period_sales()...")
         today = date.today()
         yesterday = today - timedelta(days=1)
         
@@ -105,15 +105,15 @@ def test_private_methods():
             period_start=yesterday,
             period_end=today
         )
-        print(f"✅ Ventas del período:")
+        print(f" Ventas del período:")
         print(f"   Cantidad: {sales['sales_count']}")
         print(f"   Total: ₡{sales['total_sales']}")
         
-        print("✅ TEST 3 PASADO: Métodos privados funcionan")
+        print(" TEST 3 PASADO: Métodos privados funcionan")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 3 FALLÓ: {str(e)}")
+        print(f" TEST 3 FALLÓ: {str(e)}")
         return False
 
 def test_validate_settlement_eligibility():
@@ -129,14 +129,14 @@ def test_validate_settlement_eligibility():
         future_start = date.today() + timedelta(days=30)
         future_end = date.today() + timedelta(days=60)
         
-        print("🔄 Probando período futuro (sin ventas)...")
+        print(" Probando período futuro (sin ventas)...")
         eligibility = repo.validate_settlement_eligibility(
             commerce_id=1,
             period_start=future_start,
             period_end=future_end
         )
         
-        print(f"✅ Elegibilidad resultado:")
+        print(f" Elegibilidad resultado:")
         print(f"   Elegible: {eligibility['eligible']}")
         print(f"   Ventas: {eligibility.get('sales_count', 0)}")
         print(f"   Razón: {eligibility.get('reason', 'N/A')}")
@@ -145,22 +145,22 @@ def test_validate_settlement_eligibility():
         past_start = date.today() - timedelta(days=60)
         past_end = date.today() - timedelta(days=30)
         
-        print("🔄 Probando período pasado...")
+        print(" Probando período pasado...")
         eligibility2 = repo.validate_settlement_eligibility(
             commerce_id=1,
             period_start=past_start,
             period_end=past_end
         )
         
-        print(f"✅ Elegibilidad resultado:")
+        print(f" Elegibilidad resultado:")
         print(f"   Elegible: {eligibility2['eligible']}")
         print(f"   Ventas: {eligibility2.get('sales_count', 0)}")
         
-        print("✅ TEST 4 PASADO: Validación de elegibilidad funciona")
+        print(" TEST 4 PASADO: Validación de elegibilidad funciona")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 4 FALLÓ: {str(e)}")
+        print(f" TEST 4 FALLÓ: {str(e)}")
         return False
 
 def test_calculate_settlement_preview():
@@ -176,7 +176,7 @@ def test_calculate_settlement_preview():
         period_start = date(2024, 10, 1)
         period_end = date(2024, 10, 31)
         
-        print(f"🔄 Calculando preview para período: {period_start} - {period_end}")
+        print(f" Calculando preview para período: {period_start} - {period_end}")
         
         preview = repo.calculate_settlement_preview(
             commerce_id=1,
@@ -184,7 +184,7 @@ def test_calculate_settlement_preview():
             period_end=period_end
         )
         
-        print(f"✅ Preview de liquidación:")
+        print(f" Preview de liquidación:")
         print(f"   Comercio: {preview['commerce_id']}")
         print(f"   Período: {preview['period']}")
         print(f"   Ventas: {preview['sales_count']} transacciones")
@@ -199,25 +199,25 @@ def test_calculate_settlement_preview():
         expected_settlement = expected_commission - preview['base_rent']
         
         if abs(preview['commission_amount'] - expected_commission) < 0.01:
-            print("✅ Cálculo de comisión correcto")
+            print(" Cálculo de comisión correcto")
         else:
             raise ValueError("Cálculo de comisión incorrecto")
             
         if abs(preview['settlement_amount'] - expected_settlement) < 0.01:
-            print("✅ Cálculo de liquidación correcto")
+            print(" Cálculo de liquidación correcto")
         else:
             raise ValueError("Cálculo de liquidación incorrecto")
         
-        print("✅ TEST 5 PASADO: Preview de liquidación funciona")
+        print(" TEST 5 PASADO: Preview de liquidación funciona")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 5 FALLÓ: {str(e)}")
+        print(f" TEST 5 FALLÓ: {str(e)}")
         return False
 
 def create_test_sales():
     """Helper: Crear ventas de prueba para testing"""
-    print("\n🔧 CREANDO VENTAS DE PRUEBA...")
+    print("\n CREANDO VENTAS DE PRUEBA...")
     
     try:
         sale_repo = SaleRepository()
@@ -227,7 +227,7 @@ def create_test_sales():
         user_count = sale_repo.execute_scalar("SELECT COUNT(*) FROM MKUsers")
         
         if commerce_count == 0 or user_count == 0:
-            print("⚠️  No hay comercios o usuarios, saltando creación de ventas")
+            print("  No hay comercios o usuarios, saltando creación de ventas")
             return False
         
         # Crear algunas ventas de prueba
@@ -245,15 +245,15 @@ def create_test_sales():
                     items=test_items
                 )
                 sales_created += 1
-                print(f"✅ Venta {i+1} creada: ID {result['sale_id']}, Total: ₡{result['total_amount']}")
+                print(f" Venta {i+1} creada: ID {result['sale_id']}, Total: ₡{result['total_amount']}")
             except Exception as e:
-                print(f"⚠️  Error creando venta {i+1}: {str(e)}")
+                print(f"  Error creando venta {i+1}: {str(e)}")
         
-        print(f"✅ {sales_created} ventas de prueba creadas")
+        print(f" {sales_created} ventas de prueba creadas")
         return sales_created > 0
         
     except Exception as e:
-        print(f"❌ Error creando ventas de prueba: {str(e)}")
+        print(f" Error creando ventas de prueba: {str(e)}")
         return False
 
 def test_create_settlement_real():
@@ -273,17 +273,17 @@ def test_create_settlement_real():
         sales_check = settlement_repo._get_period_sales(1, past_month_start, today)
         
         if sales_check['sales_count'] == 0:
-            print("⚠️  No hay ventas, creando ventas de prueba...")
+            print("  No hay ventas, creando ventas de prueba...")
             if not create_test_sales():
-                print("⚠️  No se pudieron crear ventas, saltando test")
-                print("✅ TEST 6 SALTADO: Sin datos para liquidar")
+                print("  No se pudieron crear ventas, saltando test")
+                print(" TEST 6 SALTADO: Sin datos para liquidar")
                 return True
         
         # Definir período de liquidación
         period_start = date(today.year, today.month, 1)
         period_end = today
         
-        print(f"🔄 Intentando crear liquidación...")
+        print(f" Intentando crear liquidación...")
         print(f"   Comercio: 1")
         print(f"   Período: {period_start} - {period_end}")
         
@@ -291,8 +291,8 @@ def test_create_settlement_real():
         eligibility = settlement_repo.validate_settlement_eligibility(1, period_start, period_end)
         
         if not eligibility['eligible']:
-            print(f"⚠️  No elegible para liquidación: {eligibility['reason']}")
-            print("✅ TEST 6 SALTADO: No elegible (normal si ya existe)")
+            print(f"  No elegible para liquidación: {eligibility['reason']}")
+            print(" TEST 6 SALTADO: No elegible (normal si ya existe)")
             return True
         
         # Crear liquidación
@@ -303,7 +303,7 @@ def test_create_settlement_real():
             created_by_user_id=1
         )
         
-        print(f"✅ Liquidación creada exitosamente:")
+        print(f" Liquidación creada exitosamente:")
         print(f"   Settlement ID: {result['settlement_id']}")
         print(f"   Comercio: {result['commerce_id']}")
         print(f"   Período: {result['period']}")
@@ -313,22 +313,22 @@ def test_create_settlement_real():
         print(f"   Liquidación: ₡{result['settlement_amount']:,.2f}")
         
         # Test get_settlement_by_id con la liquidación recién creada
-        print(f"\n🔄 Probando get_settlement_by_id()...")
+        print(f"\n Probando get_settlement_by_id()...")
         retrieved = settlement_repo.get_settlement_by_id(result['settlement_id'])
         
         if retrieved:
-            print(f"✅ Liquidación recuperada:")
+            print(f" Liquidación recuperada:")
             print(f"   ID: {retrieved['settlement_id']}")
             print(f"   Comercio: {retrieved['commerce_name']}")
             print(f"   Total liquidación: ₡{retrieved['settlement_amount']:,.2f}")
         else:
             raise ValueError("No se pudo recuperar la liquidación creada")
         
-        print("✅ TEST 6 PASADO: Liquidación real creada y recuperada")
+        print(" TEST 6 PASADO: Liquidación real creada y recuperada")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 6 FALLÓ: {str(e)}")
+        print(f" TEST 6 FALLÓ: {str(e)}")
         return False
 
 def test_query_methods():
@@ -341,9 +341,9 @@ def test_query_methods():
         repo = SettlementRepository()
         
         # Test get_settlements_by_commerce
-        print("🔄 Probando get_settlements_by_commerce()...")
+        print(" Probando get_settlements_by_commerce()...")
         settlements = repo.get_settlements_by_commerce(commerce_id=1, limit=5)
-        print(f"✅ Liquidaciones por comercio: {len(settlements)} encontradas")
+        print(f" Liquidaciones por comercio: {len(settlements)} encontradas")
         
         if settlements:
             print("   Últimas liquidaciones:")
@@ -352,11 +352,11 @@ def test_query_methods():
                       f"Período: {settlement['period_start']} - {settlement['period_end']}, "
                       f"Monto: ₡{settlement['settlement_amount']:,.2f}")
         
-        print("✅ TEST 7 PASADO: Métodos de consulta funcionan")
+        print(" TEST 7 PASADO: Métodos de consulta funcionan")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 7 FALLÓ: {str(e)}")
+        print(f" TEST 7 FALLÓ: {str(e)}")
         return False
 
 def test_calculation_logic():
@@ -369,7 +369,7 @@ def test_calculation_logic():
         repo = SettlementRepository()
         
         # Test de cálculos manuales
-        print("🔄 Probando cálculos manuales...")
+        print(" Probando cálculos manuales...")
         
         # Datos de prueba
         total_sales = Decimal('1000000.00')  # ₡1,000,000
@@ -380,7 +380,7 @@ def test_calculation_logic():
         commission_amount = total_sales * (commission_percentage / 100)
         settlement_amount = commission_amount - base_rent
         
-        print(f"✅ Cálculo manual:")
+        print(f" Cálculo manual:")
         print(f"   Ventas totales: ₡{total_sales:,.2f}")
         print(f"   Comisión {commission_percentage}%: ₡{commission_amount:,.2f}")
         print(f"   Renta base: ₡{base_rent:,.2f}")
@@ -391,17 +391,17 @@ def test_calculation_logic():
         expected_settlement = Decimal('50000.00')   # 100,000 - 50,000
         
         if commission_amount == expected_commission:
-            print("✅ Cálculo de comisión correcto")
+            print(" Cálculo de comisión correcto")
         else:
             raise ValueError(f"Comisión incorrecta: esperado {expected_commission}, obtenido {commission_amount}")
         
         if settlement_amount == expected_settlement:
-            print("✅ Cálculo de liquidación correcto")
+            print(" Cálculo de liquidación correcto")
         else:
             raise ValueError(f"Liquidación incorrecta: esperado {expected_settlement}, obtenido {settlement_amount}")
         
         # Test casos extremos
-        print("🔄 Probando casos extremos...")
+        print(" Probando casos extremos...")
         
         # Caso 1: Sin ventas
         no_sales = Decimal('0.00')
@@ -415,16 +415,16 @@ def test_calculation_logic():
         settlement_low = commission_low - base_rent
         print(f"   Ventas bajas: Liquidación = ₡{settlement_low:,.2f}")
         
-        print("✅ TEST 8 PASADO: Lógica de cálculos correcta")
+        print(" TEST 8 PASADO: Lógica de cálculos correcta")
         return True
         
     except Exception as e:
-        print(f"❌ TEST 8 FALLÓ: {str(e)}")
+        print(f" TEST 8 FALLÓ: {str(e)}")
         return False
 
 def main():
     """Ejecutar todos los tests del Settlement Repository"""
-    print("🧪 INICIANDO TESTS DE SETTLEMENT REPOSITORY")
+    print(" INICIANDO TESTS DE SETTLEMENT REPOSITORY")
     print("=" * 70)
     
     tests = [
@@ -447,27 +447,27 @@ def main():
             if test_func():
                 passed += 1
         except Exception as e:
-            print(f"❌ ERROR INESPERADO en {test_name}: {str(e)}")
+            print(f" ERROR INESPERADO en {test_name}: {str(e)}")
     
     # Resumen final
     print("\n" + "="*70)
-    print("📊 RESUMEN DE TESTS - SETTLEMENT REPOSITORY")
+    print(" RESUMEN DE TESTS - SETTLEMENT REPOSITORY")
     print("="*70)
-    print(f"✅ Tests pasados: {passed}/{total}")
-    print(f"❌ Tests fallidos: {total - passed}/{total}")
+    print(f" Tests pasados: {passed}/{total}")
+    print(f" Tests fallidos: {total - passed}/{total}")
     
     if passed == total:
-        print("\n🎉 ¡TODOS LOS TESTS PASARON!")
-        print("✅ Settlement Repository está listo para usar")
-        print("✅ Puedes proceder con Service Layer")
-        print("✅ Ready para endpoints de Power BI")
+        print("\n ¡TODOS LOS TESTS PASARON!")
+        print(" Settlement Repository está listo para usar")
+        print(" Puedes proceder con Service Layer")
+        print(" Ready para endpoints de Power BI")
     elif passed >= total - 2:
-        print(f"\n⚠️  Casi perfecto ({passed}/{total})")
-        print("✅ Settlement Repository funcional")
-        print("🔧 Revisa los tests fallidos (probablemente por falta de datos)")
+        print(f"\n  Casi perfecto ({passed}/{total})")
+        print(" Settlement Repository funcional")
+        print(" Revisa los tests fallidos (probablemente por falta de datos)")
     else:
-        print(f"\n⚠️  {total - passed} tests fallaron")
-        print("🔧 Revisa los errores antes de continuar")
+        print(f"\n  {total - passed} tests fallaron")
+        print(" Revisa los errores antes de continuar")
     
     print("="*70)
 

@@ -873,10 +873,10 @@ SELECT
     c.name as Comercio,
     p.quantity as 'Stock Restante',
     CASE 
-        WHEN p.quantity > 100 THEN '✅ Stock Alto'
-        WHEN p.quantity > 50 THEN '⚠️ Stock Medio'
-        WHEN p.quantity > 0 THEN '🔴 Stock Bajo'
-        ELSE '❌ Sin Stock'
+        WHEN p.quantity > 100 THEN 'Stock Alto'
+        WHEN p.quantity > 50 THEN 'Stock Medio'
+        WHEN p.quantity > 0 THEN 'Stock Bajo'
+        ELSE 'Sin Stock'
     END as Estado
 FROM MKProducts p
 INNER JOIN MKInventory i ON p.IDInventoryFK = i.IdInventory

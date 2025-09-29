@@ -52,7 +52,7 @@ def main():
         except Exception as e:
             print(f"Error en get_next_id: {e}")
         
-        print("\nTodos los tests del Repository Base pasaron correctamente!")
+        print("\nTodos los tests del Repository Base pasaron correctamente")
         
     except Exception as e:
         print(f"Error en tests: {str(e)}")

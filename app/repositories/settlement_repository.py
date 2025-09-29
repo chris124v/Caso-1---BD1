@@ -54,26 +54,26 @@ class SettlementRepository(BaseRepository): #Hereda de BaseRepository para usar 
             settlement_amount = commission_amount - base_rent
             
             # 5. Crear liquidacion
-            settlement_id = self.get_next_id("MKCommerceSettlement")
-            
-            #Realiza el insert en la tabla de liquidaciones
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO MKCommerceSettlement (
-                        IdCommerceSettlement, IDCommerceFK6, totalSalesAmount,
+                        IDCommerceFK6, totalSalesAmount,
                         settlementPeriodStart, settlementPeriodEnd, totalRent,
                         totalCommission, totalSettlementAmount, settlementDate,
                         createdAt, UpdatedAt, MKContractsPerCommerces_IdContractPerCommerce,
                         MKMercadoPerBuilding_IdMercadoPerBuilding
                     ) VALUES (
-                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1, 1
-                    )
-                """, (
-                    settlement_id, commerce_id, total_sales, period_start, period_end,
-                    base_rent, commission_amount, settlement_amount, datetime.now().date(),
-                    datetime.now(), datetime.now()
-                ))
-            
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1, 1
+                )
+            """, (
+                commerce_id, total_sales, period_start, period_end,
+                base_rent, commission_amount, settlement_amount, datetime.now().date(),
+                datetime.now(), datetime.now()
+            ))
+    
+            # Obtener el ID generado por MySQL
+            settlement_id = cursor.lastrowid
+
             connection.commit()
             
             # 6. Log de operacion para dejar registro de la creacion de la liquidacion

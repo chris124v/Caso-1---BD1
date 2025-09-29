@@ -7,7 +7,6 @@ from datetime import datetime
 from decimal import Decimal
 from app.repositories.base_repository import BaseRepository
 
-# Repositorio especifico para ventas
 class SaleRepository(BaseRepository):
     
     def __init__(self):
@@ -37,45 +36,55 @@ class SaleRepository(BaseRepository):
             tax_amount = subtotal * self.tax_rate
             total_amount = subtotal + tax_amount
             
-            # 2. Crear venta principal, usamos un numero de referencia unico
-            sale_id = self.get_next_id("MKSales")
-            reference_number = f"VTA-{commerce_id:04d}-{sale_id:06d}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            # 2. Crear referencia temporal (sin sale_id aún)
+            timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            reference_number = f"VTA-{commerce_id:04d}-TMP-{timestamp}"
             
             with connection.cursor() as cursor:
 
-                # Insertar venta con el query
+                # Insertar venta SIN IdSale (AUTO_INCREMENT lo genera)
                 cursor.execute("""
                     INSERT INTO MKSales (
-                        IdSale, IDCommerceFK2, saleDate, saleStatus, subTotalAmount,
+                        IDCommerceFK2, saleDate, saleStatus, subTotalAmount,
                         discountAmount, taxAmount, totalAmount, paymentStatus,
                         invoiceRequired, receiptGenerated, IDPaymentMethodFK,
                         IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum
                     ) VALUES (
-                        %s, %s, %s, 'COMPLETED', %s, 0, %s, %s, 'COMPLETED', 
+                        %s, %s, 'COMPLETED', %s, 0, %s, %s, 'COMPLETED', 
                         0, 0, %s, %s, %s, %s, %s, %s
                     )
                 """, (
-                    sale_id, commerce_id, datetime.now(), subtotal, tax_amount, 
+                    commerce_id, datetime.now(), subtotal, tax_amount, 
                     total_amount, payment_method_id, cashier_user_id, reference_number,
                     datetime.now(), datetime.now(), b'checksum_placeholder'
                 ))
                 
+                # Obtener el ID generado por MySQL
+                sale_id = cursor.lastrowid
+                
+                # Actualizar referencia con el sale_id real
+                final_reference = f"VTA-{commerce_id:04d}-{sale_id:06d}-{timestamp}"
+                cursor.execute("""
+                    UPDATE MKSales 
+                    SET referenceNumber = %s 
+                    WHERE IdSale = %s
+                """, (final_reference, sale_id))
+                
                 # 3. Crear detalles de venta 
                 for item in items: #Itera sobre cada producto de la venta 
-                    detail_id = self.get_next_id("MKSalesDetails")
                     line_total = Decimal(str(item['unit_price'])) * item['quantity']
                     
-                    #Ejecuta la insercion en la tabala MKSalesDetails
+                    #Ejecuta la insercion en la tabla MKSalesDetails SIN IdSaleDetails
                     cursor.execute("""
                         INSERT INTO MKSalesDetails (
-                            IdSaleDetails, IDSaleFK, IDProductFK3, productName,
+                            IDSaleFK, IDProductFK3, productName,
                             quantitySold, unitMeasure, unitPrice, listPrice,
                             costPrice, lineTotal, inventoryUpdated, createdAt
                         ) VALUES (
-                            %s, %s, %s, 'Producto', %s, 'unidad', %s, %s, %s, %s, 1, %s
+                            %s, %s, 'Producto', %s, 'unidad', %s, %s, %s, %s, 1, %s
                         )
                     """, (
-                        detail_id, sale_id, item['product_id'], item['quantity'],
+                        sale_id, item['product_id'], item['quantity'],
                         item['unit_price'], item['unit_price'], item['unit_price'],
                         line_total, datetime.now()
                     ))
@@ -103,7 +112,7 @@ class SaleRepository(BaseRepository):
             return {
                 'success': True,
                 'sale_id': sale_id,
-                'reference_number': reference_number,
+                'reference_number': final_reference,
                 'total_amount': float(total_amount),
                 'items_count': len(items)
             }

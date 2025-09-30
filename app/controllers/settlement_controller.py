@@ -218,7 +218,13 @@ class SettlementController:
             'Pizza Corner': 10,
             'El Buen Sabor': 1,
             'Panadería Doña María': 3,
-            'Jugos Tropicales': 5
+            'Jugos Tropicales': 5,
+            'Soda La Esquina': 6,
+            'Café Gourmet Plaza': 7,     
+            'Taco Loco': 8,                
+            'Smoothie Bar': 9,           
+            'Mini Market Express': 11,     
+            'Comida China Dragón': 12,      
         }
         
         commerce_id = commerce_map.get(commerce_name)

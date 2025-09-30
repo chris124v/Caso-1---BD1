@@ -1,0 +1,404 @@
+{
+	"info": {
+		"_postman_id": "b42b510d-849f-4116-b674-4bdd85263577",
+		"name": "Merkadit API - Caso 1",
+		"description": "API REST para gestión de mercados gastronómicos - Sistema Merkadit\n\nProyecto: Caso 1 - Bases de Datos I\nUniversidad: TEC\nFramework: FastAPI + Python\nBase de datos: MySQL\n\nEndpoints implementados:\n- Sales (Ventas): 4 endpoints\n- Settlements (Liquidaciones): 4 endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48895553",
+		"_collection_link": "https://dylanchacon1311-861284.postman.co/workspace/_dylan-_'s-Workspace~75ed9690-e4b0-487a-802b-d15e69ac7027/collection/48895553-b42b510d-849f-4116-b674-4bdd85263577?action=share&source=collection_link&creator=48895553"
+	},
+	"item": [
+		{
+			"name": "Sales - Ventas",
+			"item": [
+				{
+					"name": "Registrar Venta (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has success field\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_name\": \"Café Americano\",\n  \"store_name\": \"Café Central\",\n  \"quantity_sold\": 2,\n  \"amount_paid\": 2400.00,\n  \"payment_method\": \"Efectivo\",\n  \"payment_confirmations\": \"CONF-12345\",\n  \"reference_numbers\": \"REF-001\",\n  \"invoice_number\": \"INV-TEST-001\",\n  \"customer\": \"Juan Pérez\",\n  \"applied_discounts\": 0.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/sales/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"sales",
+								"register"
+							]
+						},
+						"description": "Registra una nueva venta en el sistema.\n\n**Stored Procedure usado:** `registerSale`\n\n**Parámetros:**\n- product_name: Nombre del producto\n- store_name: Nombre del comercio\n- quantity_sold: Cantidad vendida\n- amount_paid: Monto pagado\n- payment_method: Medio de pago\n- invoice_number: Número de factura\n\n**Respuesta esperada:** 201 Created con sale_id"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Venta por ID (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains sale data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('sale_id');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/sales/722",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"sales",
+								"722"
+							]
+						},
+						"description": "Obtiene los detalles completos de una venta específica.\n\n**Parámetros:**\n- sale_id (path): ID de la venta\n\n**Respuesta incluye:**\n- Información del comercio\n- Fecha de venta\n- Monto total\n- Items vendidos\n- Cajero que procesó la venta"
+					},
+					"response": []
+				},
+				{
+					"name": "Reporte de Ventas (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains sales report\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('total_sales');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/sales/report/Café Central?start_date=2025-09-01&end_date=2025-09-30",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"sales",
+								"report",
+								"Café Central"
+							],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2025-09-01",
+									"description": "Fecha inicio (YYYY-MM-DD)"
+								},
+								{
+									"key": "end_date",
+									"value": "2025-09-30",
+									"description": "Fecha fin (YYYY-MM-DD)"
+								}
+							]
+						},
+						"description": "Genera un reporte de ventas para un comercio en un rango de fechas.\n\n**Parámetros:**\n- store_name (path): Nombre del comercio\n- start_date (query, opcional): Fecha inicio\n- end_date (query, opcional): Fecha fin\n\n**Respuesta incluye:**\n- Total de ventas\n- Número de transacciones\n- Comisión calculada\n- Renta base\n- Lista de ventas"
+					},
+					"response": []
+				},
+				{
+					"name": "Resumen Diario (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains daily summary\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('total_sales_today');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/sales/daily/Café Central",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"sales",
+								"daily",
+								"Café Central"
+							]
+						},
+						"description": "Obtiene el resumen de ventas del día actual para un comercio.\n\n**Parámetros:**\n- store_name (path): Nombre del comercio\n\n**Respuesta incluye:**\n- Fecha actual\n- Total de ventas del día\n- Número de transacciones del día\n- Últimas 10 ventas recientes"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gestión de ventas (Sales)\n\nIncluye operaciones para:\n- Registrar nuevas ventas\n- Consultar ventas específicas\n- Generar reportes\n- Obtener resúmenes diarios"
+		},
+		{
+			"name": "Settlements - Liquidaciones",
+			"item": [
+				{
+					"name": "Liquidar Comercio (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 or 400\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+									"});",
+									"",
+									"pm.test(\"Response has success field\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"comercio\": \"Burger Express\",\n  \"local\": \"Mercado Central Cartago\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/settlements/settle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"settlements",
+								"settle"
+							]
+						},
+						"description": "Liquida un comercio para el mes actual.\n\n**Stored Procedure usado:** `settleCommerce`\n\n**Parámetros:**\n- comercio: Nombre del comercio\n- local: Nombre del local/edificio\n\n**Lógica:**\n1. Verifica si ya fue liquidado este mes\n2. Calcula total de ventas\n3. Calcula comisión y renta\n4. Crea registro de liquidación\n5. Registra transacciones financieras\n\n**Respuestas:**\n- 201: Liquidación creada exitosamente\n- 400: Ya existe liquidación para este período"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Liquidación por ID (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains settlement data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('settlement');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/settlements/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"settlements",
+								"3"
+							]
+						},
+						"description": "Obtiene los detalles completos de una liquidación específica.\n\n**Parámetros:**\n- settlement_id (path): ID de la liquidación\n\n**Respuesta incluye:**\n- Información del comercio\n- Período de liquidación\n- Total de ventas\n- Comisión calculada\n- Renta base\n- Balance final\n- Ventas incluidas en el período"
+					},
+					"response": []
+				},
+				{
+					"name": "Historial de Liquidaciones (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains settlements list\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('settlements');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/settlements/history/Café Central?limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"settlements",
+								"history",
+								"Café Central"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Número máximo de resultados (1-50)"
+								}
+							]
+						},
+						"description": "Obtiene el historial de liquidaciones de un comercio.\n\n**Parámetros:**\n- commerce_name (path): Nombre del comercio\n- limit (query, opcional): Límite de resultados (default: 10)\n\n**Respuesta incluye:**\n- Lista de liquidaciones ordenadas por fecha\n- Total acumulado\n- Cantidad de liquidaciones"
+					},
+					"response": []
+				},
+				{
+					"name": "Preview de Liquidación (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains preview data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('preview');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/settlements/preview/Café Central",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"settlements",
+								"preview",
+								"Café Central"
+							]
+						},
+						"description": "Calcula un preview de liquidación SIN crearla en la base de datos.\n\n**Parámetros:**\n- commerce_name (path): Nombre del comercio\n\n**Respuesta incluye:**\n- Cálculos de liquidación (preview)\n- Total de ventas del mes\n- Comisión calculada\n- Renta base\n- Balance estimado\n- Métricas adicionales\n- Indicador si puede liquidarse\n\n**Nota:** Este endpoint NO modifica la base de datos"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gestión de liquidaciones mensuales (Settlements)\n\nIncluye operaciones para:\n- Crear liquidaciones de comercios\n- Consultar liquidaciones específicas\n- Ver historial de liquidaciones\n- Calcular previews sin crear registros"
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}

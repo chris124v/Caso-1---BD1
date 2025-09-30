@@ -929,3 +929,177 @@ select * from MKSalesDetails;
 SELECT COUNT(*) as 'Total Ventas Creadas' FROM MKSales;
 SELECT COUNT(*) as 'Total Comercios Creados' FROM MKCommerces;
 SELECT COUNT(*) as 'Total Productos con Inventory' FROM MKProducts WHERE IDInventoryFK IS NOT NULL;
+
+-- Generacion de Ventas para multiples comercios (esto seria para que el reporte del view este mas completo)
+
+SET @current_month_start = DATE_FORMAT(CURDATE(), '%Y-%m-01');
+SET @current_month_end = LAST_DAY(CURDATE());
+
+
+-- Comercio 1: El Buen Sabor (ID: 1) - 20 ventas
+
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    1, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 12 + 8) HOUR,
+    'COMPLETED', ROUND(RAND() * 4000 + 2000, 2), 0, ROUND((RAND() * 4000 + 2000) * 0.13, 2),
+    ROUND((RAND() * 4000 + 2000) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0001-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15
+      UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20) AS n;
+
+
+-- Comercio 3: Panadería Doña María (ID: 3) - 18 ventas
+
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    3, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 12 + 6) HOUR,
+    'COMPLETED', ROUND(RAND() * 3000 + 1500, 2), 0, ROUND((RAND() * 3000 + 1500) * 0.13, 2),
+    ROUND((RAND() * 3000 + 1500) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0003-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15
+      UNION SELECT 16 UNION SELECT 17 UNION SELECT 18) AS n;
+
+
+-- Comercio 5: Jugos Tropicales (ID: 5) - 15 ventas
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    5, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 12 + 7) HOUR,
+    'COMPLETED', ROUND(RAND() * 2500 + 1000, 2), 0, ROUND((RAND() * 2500 + 1000) * 0.13, 2),
+    ROUND((RAND() * 2500 + 1000) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0005-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15) AS n;
+
+
+-- Comercio 6: Soda La Esquina (ID: 6) - 22 ventas
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    6, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 12 + 6) HOUR,
+    'COMPLETED', ROUND(RAND() * 4500 + 2500, 2), 0, ROUND((RAND() * 4500 + 2500) * 0.13, 2),
+    ROUND((RAND() * 4500 + 2500) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0006-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15
+      UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20
+      UNION SELECT 21 UNION SELECT 22) AS n;
+
+
+-- Comercio 7: Cafe Gourmet Plaza (ID: 7) - 16 ventas
+
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    7, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 12 + 7) HOUR,
+    'COMPLETED', ROUND(RAND() * 3500 + 2000, 2), 0, ROUND((RAND() * 3500 + 2000) * 0.13, 2),
+    ROUND((RAND() * 3500 + 2000) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0007-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15
+      UNION SELECT 16) AS n;
+
+
+-- Comercio 8: Taco Loco (ID: 8) - 19 ventas
+
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    8, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 12 + 11) HOUR,
+    'COMPLETED', ROUND(RAND() * 5000 + 2500, 2), 0, ROUND((RAND() * 5000 + 2500) * 0.13, 2),
+    ROUND((RAND() * 5000 + 2500) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0008-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15
+      UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19) AS n;
+
+
+-- Comercio 9: Smoothie Bar (ID: 9) - 14 ventas
+
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    9, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 12 + 8) HOUR,
+    'COMPLETED', ROUND(RAND() * 2800 + 1200, 2), 0, ROUND((RAND() * 2800 + 1200) * 0.13, 2),
+    ROUND((RAND() * 2800 + 1200) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0009-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14) AS n;
+
+
+-- Comercio 11: Mini Market Express (ID: 11) - 25 ventas
+
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    11, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 14 + 6) HOUR,
+    'COMPLETED', ROUND(RAND() * 6000 + 3000, 2), 0, ROUND((RAND() * 6000 + 3000) * 0.13, 2),
+    ROUND((RAND() * 6000 + 3000) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0011-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15
+      UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20
+      UNION SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25) AS n;
+
+
+-- Comercio 12: Comida China Dragón (ID: 12) - 17 ventas
+
+INSERT INTO MKSales (IDCommerceFK2, saleDate, saleStatus, subTotalAmount, discountAmount, taxAmount, totalAmount, paymentStatus, invoiceRequired, receiptGenerated, IDPaymentMethodFK, IDcashierUserFK, referenceNumber, createdAt, updatedAt, checksum)
+SELECT 
+    12, DATE_ADD(@current_month_start, INTERVAL FLOOR(RAND() * 28) DAY) + INTERVAL FLOOR(RAND() * 12 + 11) HOUR,
+    'COMPLETED', ROUND(RAND() * 5500 + 3000, 2), 0, ROUND((RAND() * 5500 + 3000) * 0.13, 2),
+    ROUND((RAND() * 5500 + 3000) * 1.13, 2), 'COMPLETED', 0, 1, FLOOR(RAND() * 4) + 1, 2,
+    CONCAT('VTA-0012-', LPAD(FLOOR(RAND() * 999999), 6, '0'), '-', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')),
+    NOW(), NOW(), SHA2(CONCAT('sale_', RAND()), 256)
+FROM (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 
+      UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+      UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15
+      UNION SELECT 16 UNION SELECT 17) AS n;
+
+-- Insertamos detalles de ventas para todos los productos (son fakes)
+INSERT INTO MKSalesDetails (IDSaleFK, IDProductFK3, productName, quantitySold, unitMeasure, unitPrice, listPrice, costPrice, lineTotal, inventoryUpdated, createdAt)
+SELECT 
+    s.IdSale,
+    1 AS IDProductFK3,
+    'Producto General' AS productName,
+    FLOOR(RAND() * 3) + 1 AS quantitySold,
+    'unidad' AS unitMeasure,
+    ROUND(s.totalAmount / (FLOOR(RAND() * 3) + 1), 2) AS unitPrice,
+    ROUND(s.totalAmount / (FLOOR(RAND() * 3) + 1), 2) AS listPrice,
+    ROUND(s.totalAmount / (FLOOR(RAND() * 3) + 1) * 0.5, 2) AS costPrice,
+    s.totalAmount AS lineTotal,
+    1 AS inventoryUpdated,
+    NOW() AS createdAt
+FROM MKSales s
+WHERE s.IDCommerceFK2 IN (1, 3, 5, 6, 7, 8, 9, 11, 12)
+  AND s.saleDate >= @current_month_start
+  AND s.IdSale NOT IN (SELECT IDSaleFK FROM MKSalesDetails WHERE IDSaleFK = s.IdSale);
+
+-- Verificacion
+SELECT 
+    c.IdCommerce,
+    c.name AS 'Comercio',
+    COUNT(s.IdSale) AS 'Ventas Septiembre 2025',
+    FORMAT(SUM(s.totalAmount), 2) AS 'Total Vendido (₡)'
+FROM MKCommerces c
+LEFT JOIN MKSales s ON c.IdCommerce = s.IDCommerceFK2
+    AND MONTH(s.saleDate) = 9
+    AND YEAR(s.saleDate) = 2025
+WHERE c.IdCommerce IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+GROUP BY c.IdCommerce, c.name
+ORDER BY c.name;
+
+-- Ver la VIEW actualizada con TODOS los comercios
+SELECT * FROM vw_BusinessReport;

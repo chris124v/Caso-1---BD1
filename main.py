@@ -108,22 +108,16 @@ async def global_exception_handler(request: Request, exc: Exception):
         }
     )
 
-# ============================================================================
-# IMPORTAR Y REGISTRAR ROUTERS (Handlers)
-# ============================================================================
+# Importamos handlers y routers
 
-from app.handlers import sale_handler
+from app.handlers import sale_handler, settlement_handler
 
-# Registrar router de ventas
+# Registrar routers
 app.include_router(sale_handler.router)
+app.include_router(settlement_handler.router)
 
-# TODO: Descomentar cuando crees settlement_handler
-# from app.handlers import settlement_handler
-# app.include_router(settlement_handler.router)
 
-# ============================================================================
-# ENDPOINTS BÁSICOS
-# ============================================================================
+#Endpoints basicos 
 
 @app.get(
     "/",

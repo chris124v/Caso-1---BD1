@@ -1,6 +1,37 @@
+# Environment variables
+.env
+
+# Python
 venv/
 __pycache__/
-.env
 *.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Logs
 *.log
+
+# Power BI
+*.pbix~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Database
+*.sql~

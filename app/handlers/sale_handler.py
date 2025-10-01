@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/sales", tags=["Sales"])
 controller = SaleController()
 
-# ============================================================================
-# ENDPOINTS
-# ============================================================================
+
+# Eendpoints
+
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_sale(sale_data: RegisterSaleRequest):

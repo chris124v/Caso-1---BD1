@@ -5,7 +5,7 @@ Repositorio del Caso #1 de Bases de Datos I.
 * Rodrigo Nuñez Nuñez 
 
 ## Integrantes
-* Dylan Gabriel Chacon Berrocal, 
+* Dylan Gabriel Chacon Berrocal, 2023171126
 * Christopher Daniel Vargas Villalta, 2024108443
 
 ---
